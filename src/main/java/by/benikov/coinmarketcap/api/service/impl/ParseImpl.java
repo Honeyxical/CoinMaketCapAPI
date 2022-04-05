@@ -1,7 +1,7 @@
 package by.benikov.coinmarketcap.api.service.impl;
 
 import by.benikov.coinmarketcap.api.entity.Coin;
-import by.benikov.coinmarketcap.api.service.ParseInterface;
+import com.google.gson.internal.bind.util.ISO8601Utils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -10,7 +10,7 @@ import org.json.simple.parser.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParseImpl implements ParseInterface {
+public class ParseImpl {
 
     private static final String TAG_DATA_ROOT = "data";
     private static final String TAG_ID = "id";
@@ -19,11 +19,10 @@ public class ParseImpl implements ParseInterface {
     private static final String TAG_SLUG = "slug";
     private static final String TAG_PLATFORM = "platform";
     private static final String TAG_QUOTE = "quote";
-    private static final String TAG_USD = "usd";
+    private static final String TAG_USD = "USD";
     private static final String TAG_PRICE = "price";
 
-    @Override
-    public List<Coin> parseResponse(String response) {
+    public static List<Coin> parseResponse(String response) {
         List<Coin> coinList = new ArrayList<>(); // ToDo maybe need to switch on linkedlist
         JSONParser parser = new JSONParser();
         JSONObject rootJSONObject = null;
@@ -35,23 +34,28 @@ public class ParseImpl implements ParseInterface {
 
         assert rootJSONObject != null;
         JSONArray jsonCoinArray = (JSONArray) rootJSONObject.get(TAG_DATA_ROOT);
-        Coin coin = new Coin();
         for(Object jsonCoin: jsonCoinArray){
-            createObject(coin, (JSONObject) jsonCoin);
-            coinList.add(coin);
+            coinList.add(createObject((JSONObject) jsonCoin));
         }
         return coinList;
     }
 
-    public static void createObject(Coin coin, JSONObject jsonCoin) {
+    private static Coin createObject( JSONObject jsonCoin) {
+        Coin coin = new Coin();
         coin.setId((Long) jsonCoin.get(TAG_ID))
                 .setName((String) jsonCoin.get(TAG_NAME))
                 .setSymbol((String) jsonCoin.get(TAG_SYMBOL))
-                .setSlug((String) jsonCoin.get(TAG_SLUG))
-                .setPlatform((String) jsonCoin.get(TAG_PLATFORM));
+                .setSlug((String) jsonCoin.get(TAG_SLUG));
+//                .setPlatform((String) jsonCoin.get(TAG_PLATFORM)); // ToDo  display token on witch it is based
 
         JSONObject quoteObject = (JSONObject) jsonCoin.get(TAG_QUOTE);
         JSONObject usdObject = (JSONObject) quoteObject.get(TAG_USD);
-        coin.setPrice((Double) usdObject.get(TAG_PRICE));
+        try{
+            coin.setPrice((Double) usdObject.get(TAG_PRICE));
+        }catch (ClassCastException e){
+            System.out.println(usdObject.get(TAG_PRICE));
+            System.out.println("ebaiy long : ");
+        }
+        return coin;
     }
 }

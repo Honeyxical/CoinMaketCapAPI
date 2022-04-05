@@ -4,15 +4,44 @@ import lombok.Data;
 
 @Data
 public class Coin {
-    private int id;
+    private Long id;
     private String name;
     private String symbol;
     private String slug;
-    private Boolean isMineable;
     private double price;
     private String platform;
 
     public Coin() {
+    }
+
+    public Coin setId(Long id) {
+        this.id = id;
+        return this;
+    }
+
+    public Coin setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public Coin setSymbol(String symbol) {
+        this.symbol = symbol;
+        return this;
+    }
+
+    public Coin setSlug(String slug) {
+        this.slug = slug;
+        return this;
+    }
+
+    public Coin setPrice(double price) {
+        this.price = price;
+        return this;
+    }
+
+    public Coin setPlatform(String platform) {
+        this.platform = platform;
+        return this;
     }
 
     @Override
@@ -21,8 +50,7 @@ public class Coin {
                 ", name='" + name + '\'' +
                 ", symbol='" + symbol + '\'' +
                 ", slug='" + slug + '\'' +
-                ", isMineable=" + isMineable +
                 ", price=" + price +
-                ", platform='" + platform + '\'' + "\n";
+                ", platform='" + platform + '\'';
     }
 }
