@@ -33,11 +33,23 @@ public class ParseImpl {
         }//ToDo add finally if exception catch app should not drop
 
         assert rootJSONObject != null;
+
+        responseValidate(rootJSONObject);
+
         JSONArray jsonCoinArray = (JSONArray) rootJSONObject.get(TAG_DATA_ROOT);
         for(Object jsonCoin: jsonCoinArray){
             coinList.add(createObject((JSONObject) jsonCoin));
         }
         return coinList;
+    }
+
+    private static void responseValidate(JSONObject rootJSONObject){
+        JSONArray dataValue = (JSONArray) rootJSONObject.get("data");
+        if(dataValue == null){
+            JSONObject errorStatus = (JSONObject) rootJSONObject.get("status");
+            throw new RuntimeException("Error code: " + errorStatus.get("error_code") + "" +
+                    "\n Error message: " + errorStatus.get("error_message"));
+        }
     }
 
     private static Coin createObject( JSONObject jsonCoin) {
@@ -58,4 +70,5 @@ public class ParseImpl {
         }
         return coin;
     }
+
 }

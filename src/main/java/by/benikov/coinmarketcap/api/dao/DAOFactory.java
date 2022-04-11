@@ -1,5 +1,6 @@
 package by.benikov.coinmarketcap.api.dao;
 
+import jakarta.ws.rs.DefaultValue;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
@@ -10,6 +11,8 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -19,7 +22,7 @@ public final class DAOFactory {
     private static String apiKey; // ToDo hide apiKey
 
     public static String makeAPICall(String uri, List<NameValuePair> parameters){
-        String response_content = "";
+        String responseContent = "";
 
         URIBuilder query = null;
         try {
@@ -42,9 +45,11 @@ public final class DAOFactory {
         request.setHeader(HttpHeaders.ACCEPT, "application/json");
         request.addHeader("X-CMC_PRO_API_KEY", apiKey);
 
+        System.out.println(query + "\n" + request);
+
         try (CloseableHttpResponse response = client.execute(request)) {
             HttpEntity entity = response.getEntity();
-            response_content = EntityUtils.toString(entity);
+            responseContent = EntityUtils.toString(entity);
             EntityUtils.consume(entity);
         } catch (ClientProtocolException e) {
             System.out.println("Error execute request \n" + e);
@@ -52,11 +57,12 @@ public final class DAOFactory {
             e.printStackTrace();
         }
 
-        return response_content;
+        return responseContent;
     }
 
-    public static void setApiKey(String api){
+    @DefaultValue("fdcbd548-fa0f-48fa-b766-2cd8d46fcdcd")
+    public static void setApiKey(String apiKey){
         //ToDo validate api key
-        apiKey = api;
+        DAOFactory.apiKey = apiKey;
     }
 }
