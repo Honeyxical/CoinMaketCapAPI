@@ -2,6 +2,8 @@ package by.benikov.coinmarketcap.api.entity;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class Coin {
     private Long id;
@@ -9,7 +11,7 @@ public class Coin {
     private String symbol;
     private String slug;
     private double price;
-    private String platform;
+    private String tokenAddress;
 
     public Coin() {
     }
@@ -39,8 +41,13 @@ public class Coin {
         return this;
     }
 
-    public Coin setPlatform(String platform) {
-        this.platform = platform;
+    public String getTokenAddress() {
+        return tokenAddress;
+    }
+
+    public Coin setTokenAddress() {
+//        ListingLatestInterface ll = new ListingLatestImpl();
+//        this.tokenAddress =
         return this;
     }
 
@@ -51,6 +58,44 @@ public class Coin {
                 ", symbol='" + symbol + '\'' +
                 ", slug='" + slug + '\'' +
                 ", price=" + price +
-                ", platform='" + platform + '\'';
+                ", platform='";
     }
+
+    @Data
+    public static class Metadata extends Coin {
+        private String website;
+        private String technicalDoc;
+        private String twitter;
+        private String reddit;
+        private String messageBoard;
+        private String announcement;
+        private String chat;
+        private String explorer;
+        private String sourceCode;
+        private String logo;
+        private String description;
+        private String dateAdded;
+        private String category;
+
+        public Metadata() {
+        }
+
+        @Override
+        public String toString() {
+            return "website=" + website +
+                    ", technicalDoc=" + technicalDoc +
+                    ", twitter=" + twitter +
+                    ", reddit=" + reddit +
+                    ", messageBoard=" + messageBoard +
+                    ", announcement=" + announcement +
+                    ", chat=" + chat +
+                    ", explorer=" + explorer +
+                    ", sourceCode=" + sourceCode +
+                    ", logo='" + logo + '\'' +
+                    ", description='" + description + '\'' +
+                    ", dateAdded='" + dateAdded + '\'' +
+                    ", category='" + category + '\'';
+        }
+    }
+
 }

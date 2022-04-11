@@ -1,7 +1,7 @@
 package by.benikov.coinmarketcap.api.service.impl;
 
 import by.benikov.coinmarketcap.api.entity.Coin;
-import com.google.gson.internal.bind.util.ISO8601Utils;
+import jakarta.ws.rs.DefaultValue;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -34,7 +34,7 @@ public class ParseImpl {
 
         assert rootJSONObject != null;
 
-        responseValidate(rootJSONObject);
+//        responseValidate(rootJSONObject);
 
         JSONArray jsonCoinArray = (JSONArray) rootJSONObject.get(TAG_DATA_ROOT);
         for(Object jsonCoin: jsonCoinArray){
@@ -51,6 +51,57 @@ public class ParseImpl {
                     "\n Error message: " + errorStatus.get("error_message"));
         }
     }
+
+    //Parse metadata
+
+    public static Coin.Metadata parseMetadata(String response, String id, Coin.Metadata metadata){
+        JSONParser parser = new JSONParser();
+        JSONObject rootJSONObject = null;
+        try {
+            rootJSONObject = (JSONObject) parser.parse(response);
+        } catch (ParseException e) {
+            System.out.println("Error parse response \n" + e);
+        }//ToDo add finally if exception catch app should not drop
+
+        assert rootJSONObject != null;
+
+//        responseValidate(rootJSONObject);
+
+        JSONObject dataObject = (JSONObject) rootJSONObject.get("data");
+        JSONObject idObject = (JSONObject) dataObject.get(id); // ToDo Validate entry id
+        JSONObject urlObject = (JSONObject) idObject.get("urls"); // get urls
+        setUrl(urlObject, metadata);
+        metadata.setLogo((String) dataObject.get("logo"));
+        metadata.setDescription((String) dataObject.get("description"));
+        metadata.setDateAdded((String) dataObject.get("date_added"));
+        metadata.setCategory((String) dataObject.get("category"));
+        return metadata;
+    }
+
+    private static void setUrl(JSONObject urlObject, Coin.Metadata metadata){
+        JSONArray websiteArray = (JSONArray) urlObject.get("website");
+        JSONArray technicalDoc = (JSONArray) urlObject.get("technical_doc");
+        JSONArray twitter = (JSONArray) urlObject.get("twitter");
+        JSONArray reddit = (JSONArray) urlObject.get("reddit");
+        JSONArray messageBoard = (JSONArray) urlObject.get("message_board");
+        JSONArray announcement = (JSONArray) urlObject.get("announcement");
+        JSONArray chat = (JSONArray) urlObject.get("chat");
+        JSONArray explorer = (JSONArray) urlObject.get("explorer");
+        JSONArray sourceCode = (JSONArray) urlObject.get("source_code");
+
+
+        metadata.setWebsite(String.valueOf(websiteArray.stream().findFirst()));
+        metadata.setTechnicalDoc(String.valueOf(technicalDoc.stream().findFirst()));
+        metadata.setTwitter(String.valueOf(twitter.stream().findFirst()));
+        metadata.setReddit(String.valueOf(reddit.stream().findFirst()));
+        metadata.setMessageBoard(String.valueOf(messageBoard.stream().findFirst()));
+        metadata.setAnnouncement(String.valueOf(announcement.stream().findFirst()));
+        metadata.setChat(String.valueOf(chat.stream().findFirst()));
+        metadata.setExplorer(String.valueOf(explorer.stream().findFirst()));
+        metadata.setSourceCode(String.valueOf(sourceCode.stream().findFirst()));
+    }
+
+    //Parse coin
 
     private static Coin createObject( JSONObject jsonCoin) {
         Coin coin = new Coin();

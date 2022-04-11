@@ -1,7 +1,7 @@
 package by.benikov.coinmarketcap.api.dao.impl;
 
 import by.benikov.coinmarketcap.api.dao.DAOFactory;
-import by.benikov.coinmarketcap.api.dao.ListingLatestInterface;
+import by.benikov.coinmarketcap.api.dao.CoinListInterface;
 import by.benikov.coinmarketcap.api.entity.Coin;
 import by.benikov.coinmarketcap.api.service.impl.ParseImpl;
 import jakarta.ws.rs.DefaultValue;
@@ -11,7 +11,7 @@ import org.apache.http.message.BasicNameValuePair;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListingLatestImpl implements ListingLatestInterface {
+public class CoinListImpl implements CoinListInterface {
     private static final String uri = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest";
     private static final List<NameValuePair> parameters = new ArrayList<>();
 
@@ -39,14 +39,26 @@ public class ListingLatestImpl implements ListingLatestInterface {
     }
 
     @Override
-    public Coin getCoinDescription(int id) {
+    public List<Coin> getCoinMetadata(int id) {
+        String uri = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/info";
+        List<Coin> coinList = new ArrayList<>();
         Coin coin = null;
+
         for(Coin coins: getAllCoin()){
             if(coins.getId() == id){
                 coin = coins;
             }
         }
-        return coin;
+        coinList.add(coin);
+
+        parameters.clear();
+        assert coin != null;
+        parameters.add((new BasicNameValuePair("id",coin.getId().toString())));
+
+        Coin.Metadata coinMetadata;
+        coinList.add(coinMetadata = ParseImpl.parseMetadata(DAOFactory.makeAPICall(uri,parameters),coin.getId().toString(),new Coin.Metadata()));
+
+        return coinList;
     }
 
 //    @Override
